@@ -1,10 +1,11 @@
 #!/usr/bin/env sh
 
-usage="usage: check <year> <day> <language> <testfile>"
+usage="usage: check <year> <day> <language> <testfile> [<benchmark>]"
 year=${1?$usage}
 day=${2?$usage}
 lang=${3?$usage}
 input=${4?$usage}
+bench=$5
 
 # get directory of this script
 script=$(readlink -f "$0")
@@ -16,13 +17,15 @@ data_path="$aoc_path/data/$input.txt"
 
 case $lang in
 "python")
-    cmd="uv run --directory $aoc_path/python main.py"
+    solve="$aoc_path/python.py"
     ;;
 "rust")
-    cmd="cargo run --manifest-path $aoc_path/rust/Cargo.toml --"
+    cargo build --target-dir /tmp/aoc_rust --manifest-path $aoc_path/rust/Cargo.toml
+    solve="/tmp/aoc_rust/debug/aoc_$year-$day"
     ;;
 "rustc")
-    cmd="cargo run --release --manifest-path $aoc_path/rust/Cargo.toml --"
+    cargo build --release --target-dir /tmp/aoc_rust --manifest-path $aoc_path/rust/Cargo.toml
+    solve="/tmp/aoc_rust/release/aoc_$year-$day"
     ;;
 "*")
     echo "unknown lang: $lang"
@@ -30,11 +33,14 @@ case $lang in
     ;;
 esac
 
-result=$(cat $data_path | $cmd)
+result=$(cat $data_path | $solve)
 diff=$(echo "$result" | diff $aoc_path/data/$4.ans -)
 code=$?
 
 [ $code -eq 0 ] && echo Solved with $lang! || echo "$diff"
+
+[ -n "$bench" ] && hyperfine --shell none --input $data_path "$solve" && exit 0
+
 echo "\n---stdout---"
 echo "$result"
 exit $code

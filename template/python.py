@@ -1,3 +1,5 @@
+#/usr/bin/env python3
+
 from fileinput import input
 
 lines = [line.strip() for line in input()]

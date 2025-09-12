@@ -8,26 +8,26 @@ input=${4?$usage}
 bench=$5
 
 # get directory of this script
-script=$(readlink -f "$0")
-script_path=$(dirname "$script")
+script=$(readlink -f $0)
+script_path=$(dirname $script)
 
 # find aoc and data paths
 aoc_path=$script_path/$year/$day
-data_path="$aoc_path/data/$input.txt"
+data_path=$aoc_path/data/$input.txt
 
 case $lang in
-"python")
-    solve="$aoc_path/python.py"
+python)
+    solve=$aoc_path/python.py
     ;;
-"rust")
+rust)
     cargo build --target-dir /tmp/aoc_rust --manifest-path $aoc_path/rust/Cargo.toml
-    solve="/tmp/aoc_rust/debug/aoc_$year-$day"
+    solve=/tmp/aoc_rust/debug/aoc_$year-$day
     ;;
-"rustc")
+rustc)
     cargo build --release --target-dir /tmp/aoc_rust --manifest-path $aoc_path/rust/Cargo.toml
-    solve="/tmp/aoc_rust/release/aoc_$year-$day"
+    solve=/tmp/aoc_rust/release/aoc_$year-$day
     ;;
-"*")
+*)
     echo "unknown lang: $lang"
     exit 1
     ;;
@@ -39,7 +39,7 @@ code=$?
 
 [ $code -eq 0 ] && echo Solved with $lang! || echo "$diff"
 
-[ -n "$bench" ] && hyperfine --shell none --input $data_path "$solve" && exit 0
+[ -n "$bench" ] && hyperfine --shell none --input $data_path $solve && exit 0
 
 echo "\n---stdout---"
 echo "$result"

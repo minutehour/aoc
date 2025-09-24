@@ -17,20 +17,23 @@ data_path=$aoc_path/data/$input.txt
 
 case $lang in
 python)
-    solve=$aoc_path/python.py
-    ;;
+	solve=$aoc_path/python.py
+	;;
+raku)
+	solve=$aoc_path/raku.raku
+	;;
 rust)
-    cargo build --target-dir /tmp/aoc_rust --manifest-path $aoc_path/rust/Cargo.toml
-    solve=/tmp/aoc_rust/debug/aoc_$year-$day
-    ;;
+	cargo build --target-dir /tmp/aoc_rust --manifest-path $aoc_path/rust/Cargo.toml
+	solve=/tmp/aoc_rust/debug/aoc_$year-$day
+	;;
 rustc)
-    cargo build --release --target-dir /tmp/aoc_rust --manifest-path $aoc_path/rust/Cargo.toml
-    solve=/tmp/aoc_rust/release/aoc_$year-$day
-    ;;
+	cargo build --release --target-dir /tmp/aoc_rust --manifest-path $aoc_path/rust/Cargo.toml
+	solve=/tmp/aoc_rust/release/aoc_$year-$day
+	;;
 *)
-    echo "unknown lang: $lang"
-    exit 1
-    ;;
+	echo "unknown lang: $lang"
+	exit 1
+	;;
 esac
 
 result=$(cat $data_path | $solve)

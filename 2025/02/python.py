@@ -1,19 +1,33 @@
 #!/usr/bin/env python3
 
-from fileinput import input
-from math import log10
-
-rs = [[int(i) for i in r.split("-")] for r in "".join(input()).split(",")]
-
-
-def invalid(i):
-    d = int(log10(i)) + 1
-    a, b = divmod(i, 10 ** (d // 2))
-    return a == b
+xs = [
+    str(x)
+    for r in input().split(",")
+    for [a, b] in [r.split("-")]
+    for x in range(int(a), int(b) + 1)
+]
 
 
-silver = sum(x for [a, b] in rs for x in range(a, b + 1) if invalid(x))
-gold = 0
+def invalid(x: str, n: int):
+    p, q = divmod(len(x), n)
+    return (
+        p != 0
+        and q == 0
+        and len(
+            {
+                x[a:b]
+                for a, b in zip(
+                    range(0, len(x) + 1, p),
+                    range(p, len(x) + 1, p),
+                )
+            }
+        )
+        == 1
+    )
+
+
+silver = sum(int(x) for x in xs if invalid(x, 2))
+gold = sum(int(x) for x in xs if any(invalid(x, n) for n in range(2, len(x) + 1)))
 
 print("silver:", silver)
 print("gold:", gold)

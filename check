@@ -30,6 +30,14 @@ rustc)
 	cargo build --release --target-dir /tmp/aoc_rust --manifest-path $aoc_path/rust/Cargo.toml
 	solve=/tmp/aoc_rust/release/aoc_$year-$day
 	;;
+c)
+	gcc $aoc_path/c.c -Wall -Wextra -Werror -std=c23 -o /tmp/aoc_c
+	solve=/tmp/aoc_c
+	;;
+cc)
+	gcc $aoc_path/c.c -Wall -Wextra -Werror -std=c23 -O3 -o /tmp/aoc_c
+	solve=/tmp/aoc_c
+	;;
 *)
 	echo "unknown lang: $lang"
 	exit 1

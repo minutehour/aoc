@@ -5,13 +5,17 @@ from fileinput import input
 lines = [[int(b) for b in line.strip()] for line in input()]
 
 
-def joltage(bs: list[int]):
-    d2 = max(bs[:-1])
-    return max(d2 * 10 + max(bs[idx + 1 :]) for idx, b in enumerate(bs[:-1]) if b == d2)
+def jolt(bs: list[int], n: int) -> int:
+    if n == 1:
+        return max(bs)
+    n -= 1
+    b = max(bs[:-n])
+    i = bs.index(b)
+    return b * (10**n) + jolt(bs[i + 1 :], n)
 
 
-silver = sum(map(joltage, lines))
-gold = 0
+silver = sum(jolt(bs, 2) for bs in lines)
+gold = sum(jolt(bs, 12) for bs in lines)
 
 print("silver:", silver)
 print("gold:", gold)

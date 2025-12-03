@@ -1,33 +1,33 @@
 #!/usr/bin/env python3
 
-xs = [
-    str(x)
-    for r in input().split(",")
-    for [a, b] in [r.split("-")]
-    for x in range(int(a), int(b) + 1)
-]
+
+from itertools import accumulate
+from bisect import bisect_left, bisect_right
+from functools import cache
+
+rs = [(int(a), int(b)) for r in input().split(",") for [a, b] in [r.split("-")]]
+N = max(len(str(x)) for r in rs for x in r)
 
 
-def invalid(x: str, n: int):
-    p, q = divmod(len(x), n)
-    return (
-        p != 0
-        and q == 0
-        and len(
-            {
-                x[a:b]
-                for a, b in zip(
-                    range(0, len(x) + 1, p),
-                    range(p, len(x) + 1, p),
-                )
-            }
-        )
-        == 1
+@cache
+def memo(p2: bool):
+    ids = sorted(
+        {
+            int(str(n) * reps)
+            for n in range(10 ** (N // 2))
+            for reps in range(2, N // len(str(n)) + 1 if p2 else 3)
+        }
     )
+    sums = list(accumulate(ids))
+    return ids[1:], sums
 
 
-silver = sum(int(x) for x in xs if invalid(x, 2))
-gold = sum(int(x) for x in xs if any(invalid(x, n) for n in range(2, len(x) + 1)))
+def prefix_sum(a: int, b: int, ids: list[int], sums: list[int]):
+    return sums[bisect_right(ids, b)] - sums[bisect_left(ids, a)]
+
+
+silver = sum(prefix_sum(*r, *memo(False)) for r in rs)
+gold = sum(prefix_sum(*r, *memo(True)) for r in rs)
 
 print("silver:", silver)
 print("gold:", gold)

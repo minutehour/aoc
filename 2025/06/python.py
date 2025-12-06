@@ -2,14 +2,17 @@
 
 from math import prod
 from fileinput import input
+from itertools import takewhile, repeat
 
-lines = [line.strip() for line in input()]
-nums = [map(int, row.split()) for row in lines[:-1]]
-fs = [prod if s == "*" else sum for s in lines[-1].split()]
+*nums, ops = [line.strip("\n") for line in input()]
+ops = [prod if op == "*" else sum for op in ops.split()]
 
+horizontal = [map(int, row.split()) for row in nums]
+silver = sum(op(chunk) for op, chunk in zip(ops, zip(*horizontal)))
 
-silver = sum(f(ns) for f, ns in zip(fs, zip(*nums)))
-gold = 0
+vertical = ("".join(ds).strip() for ds in [*zip(*nums)])
+chunks = repeat(lambda: [*map(int, takewhile(bool, vertical))])
+gold = sum(op(chunk()) for op, chunk in zip(ops, chunks))
 
 print("silver:", silver)
 print("gold:", gold)

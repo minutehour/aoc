@@ -4,6 +4,8 @@ from fileinput import input
 from math import dist, prod
 from operator import itemgetter
 
+MAX_CONNS = 1000  # test: 10, input: 1000
+
 boxes = [[*map(int, line.split(","))] for line in input()]
 N = len(boxes)
 
@@ -13,15 +15,15 @@ conns = sorted(
     key=lambda t: dist(*itemgetter(*t)(boxes)),
 )
 
-for x, y in conns[:1000]:
+for n, (x, y) in enumerate(conns):
+    if n == MAX_CONNS:
+        lens = {id(j): len(j) for j in js.values()}.values()
+        print("silver:", prod(sorted(lens, reverse=True)[:3]))
+
     j = js[x] | js[y]
     for b in j:
         js[b] = j
 
-lens = {id(j): len(j) for j in js.values()}.values()
-
-silver = prod(sorted(lens, reverse=True)[:3])
-gold = 0
-
-print("silver:", silver)
-print("gold:", gold)
+    if len(j) == N:
+        print("gold:", boxes[x][0] * boxes[y][0])
+        break

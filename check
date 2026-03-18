@@ -1,42 +1,41 @@
 #!/usr/bin/env sh
 
-usage="usage: check <year> <day> <language> <testfile> [<benchmark>]"
-year=${1?$usage}
-day=${2?$usage}
-lang=${3?$usage}
-input=${4?$usage}
-bench=$5
+usage="usage: check <directory> <language> <testfile> [<benchmark>]"
+puzzle=${1?$usage}
+lang=${2?$usage}
+input=${3?$usage}
+bench=$4
 
 # get directory of this script
-script=$(readlink -f $0)
-script_path=$(dirname $script)
+script=$(readlink -f "$0")
+script_path=$(dirname "$script")
 
-# find aoc and data paths
-aoc_path=$script_path/$year/$day
-data_path=$aoc_path/data/$input.txt
+# get puzzle and data paths
+puzzle_path="$script_path"/"$puzzle"
+data_path="$puzzle_path"/data/"$input".txt
 
 case $lang in
 python)
-	solve=$aoc_path/python.py
+	solve="$puzzle_path"/python.py
 	;;
 raku)
-	solve=$aoc_path/raku.raku
+	solve="$puzzle_path"/raku.raku
 	;;
 rust)
-	cargo build --target-dir /tmp/aoc_rust --manifest-path $aoc_path/rust/Cargo.toml
-	solve=/tmp/aoc_rust/debug/aoc_$year-$day
+	cargo build --target-dir /tmp/puzzle_rust --manifest-path "$puzzle_path"/rust/Cargo.toml
+	solve=/tmp/puzzle_rust/debug/puzzle
 	;;
 rustc)
-	cargo build --release --target-dir /tmp/aoc_rust --manifest-path $aoc_path/rust/Cargo.toml
-	solve=/tmp/aoc_rust/release/aoc_$year-$day
+	cargo build --release --target-dir /tmp/puzzle_rust --manifest-path "$puzzle_path"/rust/Cargo.toml
+	solve=/tmp/puzzle_rust/release/puzzle
 	;;
 c)
-	gcc $aoc_path/c.c -Wall -Wextra -Werror -std=c23 -o /tmp/aoc_c
-	solve=/tmp/aoc_c
+	gcc "$puzzle_path"/c.c -Wall -Wextra -Werror -std=c23 -o /tmp/puzzle_c
+	solve=/tmp/puzzle_c
 	;;
 cc)
-	gcc $aoc_path/c.c -Wall -Wextra -Werror -std=c23 -O3 -o /tmp/aoc_c
-	solve=/tmp/aoc_c
+	gcc "$puzzle_path"/c.c -Wall -Wextra -Werror -std=c23 -O3 -o /tmp/puzzle_c
+	solve=/tmp/puzzle_c
 	;;
 *)
 	echo "unknown lang: $lang"
@@ -44,14 +43,14 @@ cc)
 	;;
 esac
 
-result=$(cat $data_path | $solve)
-diff=$(echo "$result" | diff $aoc_path/data/$4.ans -)
+result=$(cat "$data_path" | $solve)
+diff=$(echo "$result" | diff "$puzzle_path"/data/"$3".ans -)
 code=$?
 
-[ $code -eq 0 ] && echo Solved with $lang! || echo "$diff"
+[ $code -eq 0 ] && echo Solved with "$lang"! || echo "$diff"
 
-[ -n "$bench" ] && hyperfine --shell none --input $data_path $solve && exit 0
+[ -n "$bench" ] && hyperfine --shell none --input "$data_path" "$solve" && exit 0
 
-echo "\n---stdout---"
+printf "\n---stdout---\n"
 echo "$result"
 exit $code

@@ -1,38 +1,36 @@
 #!/usr/bin/env sh
 
-usage="usage: init <year> <day> <language>"
-year=${1?$usage}
-day=${2?$usage}
-lang=${3?$usage}
+usage="usage: init <directory> <language>"
+puzzle=${1?$usage}
+lang=${2?$usage}
 
 # get directory of this script
-script=$(readlink -f $0)
-script_path=$(dirname $script)
+script=$(readlink -f "$0")
+script_path=$(dirname "$script")
 
-aoc_path=$script_path/$year/$day
+puzzle_path="$script_path"/"$puzzle"
 
-mkdir --parents $aoc_path
-touch $aoc_path/puzzle.txt
+mkdir --parents "$puzzle_path"
+touch "$puzzle_path"/puzzle.txt
 
 # data directory
-if [ ! -d $aoc_path/data ]; then
-	mkdir --parents $aoc_path/data
-	for f in "test" "aoc"; do
-		touch $aoc_path/data/$f.txt
-		echo "silver: ???\ngold: ???" >$aoc_path/data/$f.ans
-	done
+if [ ! -d "$puzzle_path"/data ]; then
+	mkdir "$puzzle_path"/data
+
+	touch "$puzzle_path"/data/test.txt
+	touch "$puzzle_path"/data/test.ans
 fi
 
 case $lang in
 python)
-	cp $script_path/template/python.py $aoc_path
+	cp "$script_path"/template/python.py "$puzzle_path"
 	;;
 rust)
-	cargo new --vcs none --name aoc_$year-$day $aoc_path/rust
-	cp $script_path/template/main.rs $aoc_path/rust/src/main.rs
+	cargo new --vcs none --name puzzle "$puzzle_path"/rust
+	cp "$script_path"/template/main.rs "$puzzle_path"/rust/src/main.rs
 	;;
 *)
-	echo unknown lang: $lang
+	echo unknown lang: "$lang"
 	exit 1
 	;;
 esac

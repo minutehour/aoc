@@ -1,9 +1,9 @@
 #!/usr/bin/env raku
 
-my @rs = lines>>.words.map(&cache);
+my @rs = lines.map: *.words.Array;
 
-sub incr ($r) { $r.rotor(2=>-1).map({ ([-] $_) (elem) (1..3)}).all };
-sub safe ($r) { so $r.&incr || $r.reverse.&incr };
+my &dec = &{ .rotor(2=>-1).map({ ([-] $_) (elem) (1..3)}).all };
+my &safe = &{ .&dec || .reverse.&dec };
 
-say "silver: ", @rs.map(&safe).sum;
-say "gold: ", @rs.map({ $_.combinations($_-1).map(&safe).any.so }).sum;
+say "silver: ", +@rs.grep(&safe);
+say "gold: ", +@rs.grep({ .combinations($_-1).grep(&safe).any });
